@@ -1,0 +1,559 @@
+{
+  "name": "Teste 1 | Onboarding Automação.",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -208
+      ],
+      "id": "71c5c047-aa28-4108-9a7d-169b3f755375",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1bdf059-cab3-4bdd-8304-694819728256",
+              "name": "cliente_nome",
+              "value": "João Silva",
+              "type": "string"
+            },
+            {
+              "id": "e77a4a4a-9213-460b-bf81-e8cfe4de5fac",
+              "name": "cliente_email",
+              "value": "felipearaujoexecutive@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "3ce4db32-c5f4-4b4e-8e94-9febacf2e54d",
+              "name": "tipo_onboarding",
+              "value": "X",
+              "type": "string"
+            },
+            {
+              "id": "41ceeb72-8702-4b08-9f93-0acf5ebd4919",
+              "name": "conteudo_pdf",
+              "value": "https://drive.google.com/file/d/1zdx9QipO2eo3l56dUDOlhlxb-_UIPCTd/view?usp=sharing",
+              "type": "string"
+            },
+            {
+              "id": "05cd58d4-1364-4121-a3b4-b711e3b45b23",
+              "name": "conteudo_video",
+              "value": "https://drive.google.com/file/d/1PfdKjSnZfI0WopeAEMXi2pUTGBe5LEDw/view?usp=sharing",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        -432
+      ],
+      "id": "4e2470fc-8814-4dfd-ae8b-16e170f741ae",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0aa99124-788d-4700-92bb-9c4f03e3ca05",
+                    "leftValue": "={{ $json.tipo_onboarding }}",
+                    "rightValue": "X",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Onboarding X"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1f3bd155-e009-4c2b-ae10-62df797657e4",
+                    "leftValue": "={{ $json.tipo_onboarding }}",
+                    "rightValue": "Y",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Onboarding Y"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5f52ce6a-87bc-4479-b9b1-74855aa95942",
+                    "leftValue": "={{ $json.tipo_onboarding }}",
+                    "rightValue": "Z",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Onboarding Z"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        480,
+        -256
+      ],
+      "id": "c41cfdbf-be77-4484-a19e-7765b284fbba",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.cliente_email }}",
+        "subject": "={{ $json.cliente_nome }}, Segue o conteúdo dde X ",
+        "message": "=<!doctype html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n</head>\n<body style=\"margin:0;padding:0;background-color:#f4f6f8;font-family:Inter, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\">\n  <!-- container -->\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\">\n    <tr>\n      <td align=\"center\" style=\"padding:24px 12px;\">\n        <table width=\"680\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"max-width:680px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 8px 30px rgba(15,23,42,0.06);\">\n          \n          <!-- header -->\n          <tr>\n            <td style=\"background:linear-gradient(90deg,#0f172a,#0ea5a3);padding:28px 32px;color:#ffffff;\">\n              <h1 style=\"margin:0;font-size:20px;font-weight:700;letter-spacing:-0.2px;\">Seu material de Onboarding</h1>\n              <p style=\"margin:6px 0 0;font-size:13px;opacity:0.95;\">Abaixo está o PDF e o vídeo que preparamos para você.</p>\n            </td>\n          </tr>\n\n          <!-- body -->\n          <tr>\n            <td style=\"padding:28px 32px;\">\n              <p style=\"margin:0 0 12px;font-size:15px;color:#0f172a;\">\n                Olá <strong>{{ $json.cliente_nome || 'Cliente' }}</strong>,\n              </p>\n\n              <p style=\"margin:0 0 18px;color:#334155;font-size:14px;line-height:1.5;\">\n                Aqui segue o seu conteúdo de onboarding. Você pode abrir o PDF e o vídeo clicando nos botões abaixo. Caso prefira, os links também estão disponíveis mais abaixo.\n              </p>\n\n              <!-- cards -->\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"margin-top:8px;\">\n                <tr>\n                  <td style=\"padding:8px 0;\">\n                    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-radius:10px;border:1px solid #e6eef3;\">\n                      <tr>\n                        <td style=\"padding:16px;\">\n                          <strong style=\"display:block;font-size:14px;color:#0f172a;margin-bottom:6px;\">PDF do Onboarding</strong>\n                          <p style=\"margin:0 0 12px;color:#475569;font-size:13px;line-height:1.4;\">\n                            Documento com instruções e material de apoio para acompanhar sua implementação.\n                          </p>\n                          <a href=\"{{ $json.conteudo_pdf }}\" target=\"_blank\" style=\"display:inline-block;padding:10px 16px;border-radius:8px;background:#0ea5a3;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;\">\n                            Abrir PDF\n                          </a>\n                        </td>\n                      </tr>\n                    </table>\n                  </td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:8px 0;\">\n                    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-radius:10px;border:1px solid #e6eef3;\">\n                      <tr>\n                        <td style=\"padding:16px;\">\n                          <strong style=\"display:block;font-size:14px;color:#0f172a;margin-bottom:6px;\">Vídeo de Boas-Vindas</strong>\n                          <p style=\"margin:0 0 12px;color:#475569;font-size:13px;line-height:1.4;\">\n                            Assista ao vídeo explicativo com os próximos passos e dicas rápidas.\n                          </p>\n                          <a href=\"{{ $json.conteudo_video }}\" target=\"_blank\" style=\"display:inline-block;padding:10px 16px;border-radius:8px;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;\">\n                            Assistir Vídeo\n                          </a>\n                        </td>\n                      </tr>\n                    </table>\n                  </td>\n                </tr>\n              </table>\n\n              <!-- raw links -->\n              <div style=\"margin-top:18px;padding:14px;border-radius:8px;background:#f8fafc;border:1px dashed #e2e8f0;color:#334155;font-size:13px;\">\n                <p style=\"margin:0 0 6px;font-weight:600;\">Links diretos</p>\n                <p style=\"margin:0 0 4px;\">PDF: <a href=\"{{ $json.conteudo_pdf }}\" target=\"_blank\" style=\"color:#0ea5a3;text-decoration:none;\">{{ $json.conteudo_pdf }}</a></p>\n                <p style=\"margin:0;\">Vídeo: <a href=\"{{ $json.conteudo_video }}\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;\">{{ $json.conteudo_video }}</a></p>\n              </div>\n\n              <p style=\"margin:18px 0 0;color:#475569;font-size:13px;line-height:1.4;\">\n                Se tiver qualquer dúvida ou precisar de suporte, responda este e-mail — estaremos prontos para ajudar.\n              </p>\n            </td>\n          </tr>\n\n          <!-- footer -->\n          <tr>\n            <td style=\"padding:18px 32px;background:#f8fafc;color:#475569;font-size:13px;\">\n              <div style=\"display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;\">\n                <div style=\"max-width:70%;\">\n                  <strong style=\"display:block;color:#0f172a;\">Equipe de Onboarding</strong>\n                  <span>Suporte • onboarding@seudominio.com</span>\n                </div>\n                <div style=\"text-align:right;\">\n                  <small style=\"display:block;opacity:0.7;\">Este é um envio automático — não responda para uma conta genérica.</small>\n                </div>\n              </div>\n            </td>\n          </tr>\n\n        </table>\n      </td>\n    </tr>\n  </table>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        752,
+        -704
+      ],
+      "id": "a9868d1c-3ff4-490a-9461-3ed68f3a2379",
+      "name": "Send a message",
+      "webhookId": "a6c63265-732d-414f-92bc-a0a6251126c6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "h41zokoFQxwhWaAU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1bdf059-cab3-4bdd-8304-694819728256",
+              "name": "cliente_nome",
+              "value": "Roberto Dias",
+              "type": "string"
+            },
+            {
+              "id": "e77a4a4a-9213-460b-bf81-e8cfe4de5fac",
+              "name": "cliente_email",
+              "value": "felipearaujoexecutive@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "3ce4db32-c5f4-4b4e-8e94-9febacf2e54d",
+              "name": "tipo_onboarding",
+              "value": "Z",
+              "type": "string"
+            },
+            {
+              "id": "41ceeb72-8702-4b08-9f93-0acf5ebd4919",
+              "name": "conteudo_pdf",
+              "value": "https://drive.google.com/file/d/1QvVhJ1XhlAjvCXGOwyt7KeZISXwSW-n5/view?usp=sharing",
+              "type": "string"
+            },
+            {
+              "id": "05cd58d4-1364-4121-a3b4-b711e3b45b23",
+              "name": "conteudo_video",
+              "value": "https://drive.google.com/file/d/181qGvKeNb3UpkGFHkZtEOafDTdIEaxCW/view?usp=sharing",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        -48
+      ],
+      "id": "a64dad14-da8b-4294-b50f-0441ad82a005",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1bdf059-cab3-4bdd-8304-694819728256",
+              "name": "cliente_nome",
+              "value": "Pedro Augusto",
+              "type": "string"
+            },
+            {
+              "id": "e77a4a4a-9213-460b-bf81-e8cfe4de5fac",
+              "name": "cliente_email",
+              "value": "felipearaujoexecutive@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "3ce4db32-c5f4-4b4e-8e94-9febacf2e54d",
+              "name": "tipo_onboarding",
+              "value": "Y",
+              "type": "string"
+            },
+            {
+              "id": "41ceeb72-8702-4b08-9f93-0acf5ebd4919",
+              "name": "conteudo_pdf",
+              "value": "https://drive.google.com/file/d/1R8frObSKOgcjVNzf43BEKDS3CQyWN3Dj/view?usp=sharing",
+              "type": "string"
+            },
+            {
+              "id": "05cd58d4-1364-4121-a3b4-b711e3b45b23",
+              "name": "conteudo_video",
+              "value": "https://drive.google.com/file/d/15lZbmMvjNFQOvcQg7wz8zm9HYsK4PreK/view?usp=sharing",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        -240
+      ],
+      "id": "2c746961-95c3-4b31-9046-832c55b9959a",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.cliente_email }}",
+        "subject": "={{ $json.cliente_nome }}, Segue o conteúdo de {{ $json.tipo_onboarding }}",
+        "message": "=<!doctype html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n</head>\n<body style=\"margin:0;padding:0;background-color:#f4f6f8;font-family:Inter, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\">\n  <!-- container -->\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\">\n    <tr>\n      <td align=\"center\" style=\"padding:24px 12px;\">\n        <table width=\"680\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"max-width:680px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 8px 30px rgba(15,23,42,0.06);\">\n          \n          <!-- header -->\n          <tr>\n            <td style=\"background:linear-gradient(90deg,#0f172a,#0ea5a3);padding:28px 32px;color:#ffffff;\">\n              <h1 style=\"margin:0;font-size:20px;font-weight:700;letter-spacing:-0.2px;\">Seu material de Onboarding</h1>\n              <p style=\"margin:6px 0 0;font-size:13px;opacity:0.95;\">Abaixo está o PDF e o vídeo que preparamos para você.</p>\n            </td>\n          </tr>\n\n          <!-- body -->\n          <tr>\n            <td style=\"padding:28px 32px;\">\n              <p style=\"margin:0 0 12px;font-size:15px;color:#0f172a;\">\n                Olá <strong>{{ $json.cliente_nome || 'Cliente' }}</strong>,\n              </p>\n\n              <p style=\"margin:0 0 18px;color:#334155;font-size:14px;line-height:1.5;\">\n                Aqui segue o seu conteúdo de onboarding. Você pode abrir o PDF e o vídeo clicando nos botões abaixo. Caso prefira, os links também estão disponíveis mais abaixo.\n              </p>\n\n              <!-- cards -->\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"margin-top:8px;\">\n                <tr>\n                  <td style=\"padding:8px 0;\">\n                    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-radius:10px;border:1px solid #e6eef3;\">\n                      <tr>\n                        <td style=\"padding:16px;\">\n                          <strong style=\"display:block;font-size:14px;color:#0f172a;margin-bottom:6px;\">PDF do Onboarding</strong>\n                          <p style=\"margin:0 0 12px;color:#475569;font-size:13px;line-height:1.4;\">\n                            Documento com instruções e material de apoio para acompanhar sua implementação.\n                          </p>\n                          <a href=\"{{ $json.conteudo_pdf }}\" target=\"_blank\" style=\"display:inline-block;padding:10px 16px;border-radius:8px;background:#0ea5a3;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;\">\n                            Abrir PDF\n                          </a>\n                        </td>\n                      </tr>\n                    </table>\n                  </td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:8px 0;\">\n                    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-radius:10px;border:1px solid #e6eef3;\">\n                      <tr>\n                        <td style=\"padding:16px;\">\n                          <strong style=\"display:block;font-size:14px;color:#0f172a;margin-bottom:6px;\">Vídeo de Boas-Vindas</strong>\n                          <p style=\"margin:0 0 12px;color:#475569;font-size:13px;line-height:1.4;\">\n                            Assista ao vídeo explicativo com os próximos passos e dicas rápidas.\n                          </p>\n                          <a href=\"{{ $json.conteudo_video }}\" target=\"_blank\" style=\"display:inline-block;padding:10px 16px;border-radius:8px;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;\">\n                            Assistir Vídeo\n                          </a>\n                        </td>\n                      </tr>\n                    </table>\n                  </td>\n                </tr>\n              </table>\n\n              <!-- raw links -->\n              <div style=\"margin-top:18px;padding:14px;border-radius:8px;background:#f8fafc;border:1px dashed #e2e8f0;color:#334155;font-size:13px;\">\n                <p style=\"margin:0 0 6px;font-weight:600;\">Links diretos</p>\n                <p style=\"margin:0 0 4px;\">PDF: <a href=\"{{ $json.conteudo_pdf }}\" target=\"_blank\" style=\"color:#0ea5a3;text-decoration:none;\">{{ $json.conteudo_pdf }}</a></p>\n                <p style=\"margin:0;\">Vídeo: <a href=\"{{ $json.conteudo_video }}\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;\">{{ $json.conteudo_video }}</a></p>\n              </div>\n\n              <p style=\"margin:18px 0 0;color:#475569;font-size:13px;line-height:1.4;\">\n                Se tiver qualquer dúvida ou precisar de suporte, responda este e-mail — estaremos prontos para ajudar.\n              </p>\n            </td>\n          </tr>\n\n          <!-- footer -->\n          <tr>\n            <td style=\"padding:18px 32px;background:#f8fafc;color:#475569;font-size:13px;\">\n              <div style=\"display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;\">\n                <div style=\"max-width:70%;\">\n                  <strong style=\"display:block;color:#0f172a;\">Equipe de Onboarding</strong>\n                  <span>Suporte • onboarding@seudominio.com</span>\n                </div>\n                <div style=\"text-align:right;\">\n                  <small style=\"display:block;opacity:0.7;\">Este é um envio automático — não responda para uma conta genérica.</small>\n                </div>\n              </div>\n            </td>\n          </tr>\n\n        </table>\n      </td>\n    </tr>\n  </table>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1088,
+        -400
+      ],
+      "id": "f7737348-03a7-4f03-a2b3-deef10df04ee",
+      "name": "Send a message1",
+      "webhookId": "a6c63265-732d-414f-92bc-a0a6251126c6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "h41zokoFQxwhWaAU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.cliente_email }}",
+        "subject": "={{ $json.cliente_nome }}, Segue o conteúdo de {{ $json.tipo_onboarding }}",
+        "message": "=<!doctype html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n</head>\n<body style=\"margin:0;padding:0;background-color:#f4f6f8;font-family:Inter, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\">\n  <!-- container -->\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\">\n    <tr>\n      <td align=\"center\" style=\"padding:24px 12px;\">\n        <table width=\"680\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"max-width:680px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 8px 30px rgba(15,23,42,0.06);\">\n          \n          <!-- header -->\n          <tr>\n            <td style=\"background:linear-gradient(90deg,#0f172a,#0ea5a3);padding:28px 32px;color:#ffffff;\">\n              <h1 style=\"margin:0;font-size:20px;font-weight:700;letter-spacing:-0.2px;\">Seu material de Onboarding</h1>\n              <p style=\"margin:6px 0 0;font-size:13px;opacity:0.95;\">Abaixo está o PDF e o vídeo que preparamos para você.</p>\n            </td>\n          </tr>\n\n          <!-- body -->\n          <tr>\n            <td style=\"padding:28px 32px;\">\n              <p style=\"margin:0 0 12px;font-size:15px;color:#0f172a;\">\n                Olá <strong>{{ $json.cliente_nome || 'Cliente' }}</strong>,\n              </p>\n\n              <p style=\"margin:0 0 18px;color:#334155;font-size:14px;line-height:1.5;\">\n                Aqui segue o seu conteúdo de onboarding. Você pode abrir o PDF e o vídeo clicando nos botões abaixo. Caso prefira, os links também estão disponíveis mais abaixo.\n              </p>\n\n              <!-- cards -->\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"margin-top:8px;\">\n                <tr>\n                  <td style=\"padding:8px 0;\">\n                    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-radius:10px;border:1px solid #e6eef3;\">\n                      <tr>\n                        <td style=\"padding:16px;\">\n                          <strong style=\"display:block;font-size:14px;color:#0f172a;margin-bottom:6px;\">PDF do Onboarding</strong>\n                          <p style=\"margin:0 0 12px;color:#475569;font-size:13px;line-height:1.4;\">\n                            Documento com instruções e material de apoio para acompanhar sua implementação.\n                          </p>\n                          <a href=\"{{ $json.conteudo_pdf }}\" target=\"_blank\" style=\"display:inline-block;padding:10px 16px;border-radius:8px;background:#0ea5a3;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;\">\n                            Abrir PDF\n                          </a>\n                        </td>\n                      </tr>\n                    </table>\n                  </td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:8px 0;\">\n                    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-radius:10px;border:1px solid #e6eef3;\">\n                      <tr>\n                        <td style=\"padding:16px;\">\n                          <strong style=\"display:block;font-size:14px;color:#0f172a;margin-bottom:6px;\">Vídeo de Boas-Vindas</strong>\n                          <p style=\"margin:0 0 12px;color:#475569;font-size:13px;line-height:1.4;\">\n                            Assista ao vídeo explicativo com os próximos passos e dicas rápidas.\n                          </p>\n                          <a href=\"{{ $json.conteudo_video }}\" target=\"_blank\" style=\"display:inline-block;padding:10px 16px;border-radius:8px;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;\">\n                            Assistir Vídeo\n                          </a>\n                        </td>\n                      </tr>\n                    </table>\n                  </td>\n                </tr>\n              </table>\n\n              <!-- raw links -->\n              <div style=\"margin-top:18px;padding:14px;border-radius:8px;background:#f8fafc;border:1px dashed #e2e8f0;color:#334155;font-size:13px;\">\n                <p style=\"margin:0 0 6px;font-weight:600;\">Links diretos</p>\n                <p style=\"margin:0 0 4px;\">PDF: <a href=\"{{ $json.conteudo_pdf }}\" target=\"_blank\" style=\"color:#0ea5a3;text-decoration:none;\">{{ $json.conteudo_pdf }}</a></p>\n                <p style=\"margin:0;\">Vídeo: <a href=\"{{ $json.conteudo_video }}\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;\">{{ $json.conteudo_video }}</a></p>\n              </div>\n\n              <p style=\"margin:18px 0 0;color:#475569;font-size:13px;line-height:1.4;\">\n                Se tiver qualquer dúvida ou precisar de suporte, responda este e-mail — estaremos prontos para ajudar.\n              </p>\n            </td>\n          </tr>\n\n          <!-- footer -->\n          <tr>\n            <td style=\"padding:18px 32px;background:#f8fafc;color:#475569;font-size:13px;\">\n              <div style=\"display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;\">\n                <div style=\"max-width:70%;\">\n                  <strong style=\"display:block;color:#0f172a;\">Equipe de Onboarding</strong>\n                  <span>Suporte • onboarding@seudominio.com</span>\n                </div>\n                <div style=\"text-align:right;\">\n                  <small style=\"display:block;opacity:0.7;\">Este é um envio automático — não responda para uma conta genérica.</small>\n                </div>\n              </div>\n            </td>\n          </tr>\n\n        </table>\n      </td>\n    </tr>\n  </table>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        864,
+        -32
+      ],
+      "id": "282e9f1b-e0b9-4aed-848c-b94ab5646a9b",
+      "name": "Send a message2",
+      "webhookId": "a6c63265-732d-414f-92bc-a0a6251126c6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "h41zokoFQxwhWaAU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "onboarding_emails",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "cliente_email",
+              "fieldValue": "={{ $json.cliente_email }}"
+            },
+            {
+              "fieldId": "cliente_nome",
+              "fieldValue": "={{ $json.cliente_nome }}"
+            },
+            {
+              "fieldId": "tipo_onboarding",
+              "fieldValue": "={{ $json.tipo_onboarding }}"
+            },
+            {
+              "fieldId": "conteudo",
+              "fieldValue": "={{ $json.conteudo_pdf }}{{ $json.conteudo_video }}"
+            },
+            {
+              "fieldId": "enviado_em",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        752,
+        -560
+      ],
+      "id": "038706de-8a64-4079-b641-f104f898f927",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "FYsI6zPBPvgEDrmJ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "onboarding_emails",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "cliente_email",
+              "fieldValue": "={{ $json.cliente_email }}"
+            },
+            {
+              "fieldId": "cliente_nome",
+              "fieldValue": "={{ $json.cliente_nome }}"
+            },
+            {
+              "fieldId": "tipo_onboarding",
+              "fieldValue": "={{ $json.tipo_onboarding }}"
+            },
+            {
+              "fieldId": "conteudo",
+              "fieldValue": "={{ $json.conteudo_pdf }}{{ $json.conteudo_video }}"
+            },
+            {
+              "fieldId": "enviado_em",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        -256
+      ],
+      "id": "c96e537f-8e12-4351-9901-e38b6f7522f5",
+      "name": "Create a row1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "FYsI6zPBPvgEDrmJ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "onboarding_emails",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "cliente_email",
+              "fieldValue": "={{ $json.cliente_email }}"
+            },
+            {
+              "fieldId": "cliente_nome",
+              "fieldValue": "={{ $json.cliente_nome }}"
+            },
+            {
+              "fieldId": "tipo_onboarding",
+              "fieldValue": "={{ $json.tipo_onboarding }}"
+            },
+            {
+              "fieldId": "conteudo",
+              "fieldValue": "={{ $json.conteudo_pdf }}{{ $json.conteudo_video }}"
+            },
+            {
+              "fieldId": "enviado_em",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        864,
+        144
+      ],
+      "id": "7a6086e8-f71b-4b33-998b-f86d43d35fd5",
+      "name": "Create a row2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "FYsI6zPBPvgEDrmJ",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a row1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a row2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "name": "Teste 2 | Extração de Dados",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        -208
+      ],
+      "id": "ef585273-b47c-4e65-828b-fc1d091e9132",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://comunicaapi.pje.jus.br/api/v1/comunicacao?nomeadvogado=Eduardo%20Koetz",
+        "options": {
+          "proxy": "http://200.174.198.158:8888"
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32,
+        -112
+      ],
+      "id": "0ecaec99-b96f-4396-8c59-fa727d0fb063",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "89c92736-4dc4-4b2c-a39a-48cc064ae614",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "const resultados = [];\n\nfor (const item of items) {\n    // Verifica se existe array de intimações dentro do item\n    if (Array.isArray(item.json.items)) {\n        item.json.items.forEach(subItem => {\n            const texto = subItem.texto || \"\";\n            const conteudo_legivel = texto.replace(/\\\\n/g, \"\\n\").trim();\n\n            resultados.push({\n                id: subItem.id,\n                advogado: \"Eduardo Koetz\",\n                conteudo_legivel\n            });\n        });\n    } else {\n        // Caso não tenha subitems, pega direto o texto\n        const texto = item.json.texto || \"\";\n        const conteudo_legivel = texto.replace(/\\\\n/g, \"\\n\").trim();\n\n        resultados.push({\n            id: item.json.id,\n            advogado: item.json.advogado?.nome || \"\",\n            conteudo_legivel\n        });\n    }\n}\n\nreturn resultados.map(r => ({ json: r }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -112
+      ],
+      "id": "b7af195b-d3de-411e-a7ac-f64aa47be222",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "tableId": "intimacoes",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "advogado",
+              "fieldValue": "={{ $json.advogado }}"
+            },
+            {
+              "fieldId": "conteudo",
+              "fieldValue": "={{ $json.conteudo_legivel }}"
+            },
+            {
+              "fieldId": "extraido_em",
+              "fieldValue": "{{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -112
+      ],
+      "id": "cfde3997-26e5-4c28-90b1-0bb5b0db450e",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "FYsI6zPBPvgEDrmJ",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "pinData": {},
+  "triggerCount": 1,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "name": "Teste 3 – Automação de Migração ADVBOX",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d193ed4f-c207-48a9-99c1-44209c6cd834",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"usuarios_advbox\": [\n    {\n      \"id\": 47753,\n      \"name\": \"ARTHUR SANTOS\",\n      \"email\": \"AGATA.SANTOS@ADVBOX.COM.BR\"\n    },\n    {\n      \"id\": 5395,\n      \"name\": \"ALAN VITAL\",\n      \"email\": \"ALAN.VITAL@ADVBOX.COM.BR\"\n    }\n  ],\n  \"processo\": {\n    \"id\": 9904295,\n    \"protocol_number\": \"81257\",\n    \"type\": \"MIGRAÇÃO POR TRIBUNAIS\",\n    \"group\": \"BANCA JURIDICA\",\n    \"responsible_id\": 5395,\n    \"responsible\": \"ALAN VITAL\",\n    \"notes\": \"Plano: Banca Jurídica\\nMigração por: tribunais com validação\\nResponsável: Anderson Beseke\\nE-mail: anderson@beseke.adv.br\\nTelefone: 55 (48) 91874-169\\nPessoas\\nProcessos\\nDiários: Amazonas, Santa Catarina, São Paulo.\",\n    \"customers\": [\n      {\n        \"customer_id\": 10609648,\n        \"name\": \"BESEKE ADVOCACIA\",\n        \"identification\": \"53.210.047/0001-46\"\n      }\n    ]\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "dfbbb877-20ed-4de8-ac3a-cfb84bb49311",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ================== INPUTS ==================\nconst usuarios = $json.usuarios_advbox || [];\nconst processo = $json.processo;\nconst cliente = processo.customers ? processo.customers[0] : {};\n\n// ================== EXTRAÇÃO DO RESPONSÁVEL ==================\nconst responsavel = usuarios.find(u => u.id === processo.responsible_id);\n\n// ================== EXTRAÇÃO DE MIGRAR ==================\nconst migrarMatches = processo.notes.match(/Pessoas|Processos|Agenda|Financeiro/gi);\nconst migrar = migrarMatches ? [...new Set(migrarMatches)] : [];\n\n// ================== EXTRAÇÃO DE ESTADOS ==================\nlet estados = [];\nif (processo.notes) {\n    const match = processo.notes.match(/Diários:\\s*(.*)/i);\n    if (match && match[1]) {\n        const estadosTexto = match[1].split(/,|\\n/).map(e => e.trim());\n        const mapaEstados = {\n            \"Acre\": \"AC\",\"Alagoas\": \"AL\",\"Amapá\": \"AP\",\"Amazonas\": \"AM\",\"Bahia\": \"BA\",\n            \"Ceará\": \"CE\",\"Distrito Federal\": \"DF\",\"Espírito Santo\": \"ES\",\"Goiás\": \"GO\",\n            \"Maranhão\": \"MA\",\"Mato Grosso\": \"MT\",\"Mato Grosso do Sul\": \"MS\",\"Minas Gerais\": \"MG\",\n            \"Pará\": \"PA\",\"Paraíba\": \"PB\",\"Paraná\": \"PR\",\"Pernambuco\": \"PE\",\"Piauí\": \"PI\",\n            \"Rio de Janeiro\": \"RJ\",\"Rio Grande do Norte\": \"RN\",\"Rio Grande do Sul\": \"RS\",\"Rondônia\": \"RO\",\n            \"Roraima\": \"RR\",\"Santa Catarina\": \"SC\",\"São Paulo\": \"SP\",\"Sergipe\": \"SE\",\"Tocantins\": \"TO\"\n        };\n        estados = estadosTexto.map(e => mapaEstados[e]).filter(Boolean);\n    }\n}\n\n// ================== OUTROS CAMPOS ==================\nconst plano = processo.group || \"\";\nconst tipo_migracao = processo.type || \"\";\nconst cliente_nome = cliente.name || \"\";\nconst cliente_email = \"felipearaujoexecutive@gmail.com\"; // pode extrair do notes se necessário\nconst conta_id = processo.protocol_number || \"\";\nconst responsavel_nome = responsavel ? responsavel.name : processo.responsible;\nconst responsavel_email = responsavel ? responsavel.email : null;\nconst numero_estados = estados.length;\n\n// ================== REGRAS CONDICIONAIS ==================\nlet texto = \"\";\n\n// ---------- Estados ----------\nif (estados.includes(\"MG\")) {\n    texto += \"Se o seu escritório possui processos físicos no TJMG, indique as comarcas em que haja ações tramitando ou pelo menos as principais. Caso não tenha, desconsidere.\\n\\n\";\n}\nif (estados.includes(\"RS\")) {\n    texto += \"Caso possua processos no EPROC TJRS ou no PPE, pode estar enviando o relatório dos seus processos em Excel disponibilizado pelo EPROC no menu na lateral esquerda, 'relatórios'. O PPE também possui essa opção.\\n\\n\";\n}\nif (estados.includes(\"BA\")) {\n    texto += \"Para que a busca dos seus processos possa ser ainda mais assertiva, peço que forneça seu login e senha do PJE TJBA.\\n\\n\";\n}\nif (estados.includes(\"PR\")) {\n    texto += \"Caso você possua processos do PROJUDI TJPR, não há necessidade de enviar comarcas e juízos, você precisa apenas estar enviando um relatório dos seus processos disponibilizados no seu acesso ao PROJUDI. Dessa forma, irá contribuir para que a busca dos seus processos seja ainda mais assertiva!\\n\\n\";\n    texto += \"Para extrair o relatório do PROJUDI, realize o seguinte passo a passo:\\n\";\n    texto += \"a. Aba estatísticas > Relatório dinâmico > Meus processos\\n\";\n    texto += \"b. Gerar relatório\\n\";\n    texto += \"c. Colocar apenas a data de início e fim do período que pretende gerar o relatório\\n\";\n    texto += \"d. Gerar relatório\\n\";\n    texto += \"OBS 1: Se tiver a opção, preferível extrair em Excel (.xlsx, .xsl).\\n\";\n    texto += \"OBS 2: Se possível, enviar apenas os processos ativos (Ativos/Suspensos).\\n\\n\";\n}\nif (estados.includes(\"AM\") || estados.includes(\"RR\")) {\n    texto += \"Caso você possua processos do PROJUDI TJAM/TJRR, não há necessidade de enviar comarcas e juízos, você precisa apenas estar enviando seu login e senha.\\n\\n\";\n}\nif (estados.includes(\"PE\")) {\n    texto += \"Para que a busca dos seus processos possa ser ainda mais assertiva, se possível, peço que forneça seu login e senha do PJE TJPE.\\n\\n\";\n}\n// Grupo CRETA\nconst estadosCreta = [\"AL\", \"CE\", \"PB\", \"RN\", \"SE\", \"PE\"];\nif (estados.some(uf => estadosCreta.includes(uf))) {\n    texto += \"Se possuir processos no sistema CRETA: informamos que o sistema não permite a coleta pública de dados através do número da OAB. Neste caso você pode encaminhar os processos (número de CNJ) ou, se preferir, fornecer o login e senha para captura dos dados.\\n\\n\";\n}\n\n// ---------- Sistemas ----------\nlet sistema = \"\";\nconst sistemaMatch = processo.notes.match(/\\b(INSS|SSEU)\\b/i);\nif (sistemaMatch) sistema = sistemaMatch[0].toUpperCase();\n\nif (sistema === \"INSS\") {\n    texto += \"Se o escritório possuir processos no INSS, é possível realizar essa migração também. Preciso que você me envie esses processos da seguinte forma:\\n\";\n    texto += \"a) Acesse o sistema GERID > consulte e liste todos os requerimentos > filtre os ativos\\n\";\n    texto += \"b) Selecione a tabela > copie da tela a partir de 'protocolo' > arraste até o final > cole em uma planilha de Excel.\\n\\n\";\n}\n\nif (sistema === \"SSEU\") {\n    texto += \"Caso você possua processos no SEEU, você pode encaminhar o relatório dos seus processos disponibilizados no seu acesso ao PROJUDI.\\n\";\n    texto += \"Passo a passo: estatísticas > Relatório dinâmico > Meus processos > gerar relatório (com período do cadastro).\\n\";\n    texto += \"OBS 1: Preferível extrair em Excel (.xlsx, .xsl).\\n\";\n    texto += \"OBS 2: Se possível, enviar apenas os processos ativos (Ativos/Suspensos).\\n\\n\";\n}\n\n// ---------- Busca nacional ----------\nconst buscaNacional = processo.busca_nacional || false;\nif (buscaNacional) {\n    texto += \"Informe os principais tribunais, onde se concentram a maioria dos processos e principal área de atuação.\\n\\n\";\n}\n\n// ================== OUTPUT ==================\nreturn [{\n    json: {\n        plano,\n        tipo_migracao,\n        migrar,\n        estados,\n        cliente_nome,\n        cliente_email,\n        conta_id,\n        responsavel_nome,\n        responsavel_email,\n        numero_estados,\n        textoFinal: texto.trim() || \"Nenhum texto condicional aplicado.\"\n    }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "d4fbb162-7d83-416f-8fcf-7d5f658b0f2c",
+      "name": "Extração de Dados"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.cliente_email }}",
+        "subject": "={{ $json.cliente_nome }}, Parabéns pela contratação!",
+        "message": "=<!doctype html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n  <title>E-mail de Migração ADVBOX</title>\n</head>\n<body style=\"margin:0;padding:0;background-color:#f4f6f8;font-family:Inter, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\">\n  <!-- container -->\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\">\n    <tr>\n      <td align=\"center\" style=\"padding:24px 12px;\">\n        <table width=\"680\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"max-width:680px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 8px 30px rgba(15,23,42,0.06);\">\n          \n          <!-- logo -->\n          <tr>\n   <td align=\"center\" style=\"padding:20px 0;background:#ffffff;\">\n    <img src=\"https://media.licdn.com/dms/image/v2/D4D0BAQGhVUWbEJpBlA/company-logo_200_200/B4DZk35awMIcAI-/0/1757579423194/advbox_escritorios_digitais_logo?e=1761782400&v=beta&t=FaORvzrnz0sT2mRvyQPNj3Xfd2f3nxxOVXzEexna38g\" \n         alt=\"ADVBOX\" \n         width=\"60\"\n         style=\"display:block;border-radius:50%;\">\n  </td>\n</tr>\n\n          <!-- header -->\n          <tr>\n            <td style=\"background:linear-gradient(90deg,#0f172a,#0ea5a3);padding:28px 32px;color:#ffffff;\">\n              <h1 style=\"margin:0;font-size:20px;font-weight:700;letter-spacing:-0.2px;\">Seu material de Migração ADVBOX</h1>\n              <p style=\"margin:6px 0 0;font-size:13px;opacity:0.95;\">Confira abaixo os próximos passos e informações importantes.</p>\n            </td>\n          </tr>\n\n          <!-- body -->\n          <tr>\n            <td style=\"padding:28px 32px;color:#0f172a;\">\n\n              <!-- Saudação -->\n              <p style=\"margin:0 0 12px;font-size:15px;\">\n                Olá <strong>{{ $json.cliente_nome || 'Cliente' }}</strong>,\n              </p>\n\n              <!-- Apresentação do analista -->\n              <p style=\"margin:0 0 18px;color:#334155;font-size:14px;line-height:1.5;\">\n                Primeiramente, parabéns pela contratação, é um prazer ter você e sua equipe conosco!\n              </p>\n\n              <p style=\"margin:0 0 18px;color:#334155;font-size:14px;line-height:1.5;\">\n                Sou <strong>{{ $json.responsavel_nome }}</strong>, analista responsável pela migração de seus dados para a ADVBOX e será um prazer lhe auxiliar.\n              </p>\n\n              <p style=\"margin:0 0 18px;color:#334155;font-size:14px;line-height:1.5;\">\n                Meu atendimento será exclusivamente por aqui, para sua segurança, transparência e registros durante este procedimento. Por isso, peço que leia todas as informações e confirme o recebimento deste e-mail.\n              </p>\n\n              <p style=\"margin:0 0 18px;color:#334155;font-size:14px;line-height:1.5;\">\n                Para facilitar a compreensão, o e-mail está divido em 3 blocos:\n                <br>Parte 1: Confirmação da forma de migração escolhida e informações que você precisa responder;\n                <br>Parte 2: Informações sobre os dados que serão migrados;\n                <br>Parte 3: Passo a passo e instruções do procedimento.\n              </p>\n\n              <!-- Lista de instruções -->\n              <ol style=\"margin:0 0 18px;padding-left:20px;color:#334155;font-size:14px;line-height:1.5;\">\n                <li>Informe o Nome completo, OAB e CPF dos advogados que devemos capturar os processos para realizar a migração na sua conta.</li>\n                <li>Informe o número aproximado de processos judiciais ativos.</li>\n                <li>Informe o número aproximado de processos totais com arquivados (apenas para controle interno).</li>\n                <li>Os Estados e sistema contratados para a migração foram: <strong>{{ $json.estados.join(\", \") }}</strong></li>\n                <li>Listar os tribunais de atuação dos Estados contratados (ex: TJPR, TRT1, TFR2, JFRN, STJ).</li>\n                <li>\n                  Caso possua, enviar uma lista de fácil acesso em formato compatível com Excel contendo todos (ou alguns) dos seus processos. \n                  Importante: serão utilizados na análise apenas os processos com número CNJ válido. Outros dados da planilha NÃO serão considerados.\n                </li>\n                <li>\n                  Se você tiver processos no sistema eletrônico PJE de qualquer tribunal, envie seu login e senha de acesso indicando qual é o PJE.\n                  Isso ajudará na busca, considerando a limitação da quantidade de processos disponíveis publicamente.\n                </li>\n\n                <!-- Bloco condicional -->\n                <li style=\"background-color:#f0f9ff;border-left:4px solid #0ea5a3;padding:10px 15px;margin-top:10px;\">\n                  {{ $json.textoFinal }}\n                </li>\n              </ol>\n\n              <p style=\"margin:18px 0 0;color:#475569;font-size:13px;line-height:1.4;\">\n                Se tiver qualquer dúvida ou precisar de suporte, responda este e-mail — estaremos prontos para ajudar.\n              </p>\n\n            </td>\n          </tr>\n\n          <!-- footer -->\n          <tr>\n            <td style=\"padding:18px 32px;background:#f8fafc;color:#475569;font-size:13px;\">\n              <div style=\"display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;\">\n                <div style=\"max-width:70%;\">\n                  <strong style=\"display:block;color:#0f172a;\">Equipe ADVBOX</strong>\n                  <span>Suporte • suporte@advbox.com</span>\n                </div>\n                <div style=\"text-align:right;\">\n                  <small style=\"display:block;opacity:0.7;\">Este é um envio automático — não responda para uma conta genérica.</small>\n                </div>\n              </div>\n            </td>\n          </tr>\n\n        </table>\n      </td>\n    </tr>\n  </table>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "726e0b10-d7e4-4895-91c9-fd03a380bab8",
+      "name": "Send a message",
+      "webhookId": "402ac9bb-d27a-4176-8500-05d0ee5f68f5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "h41zokoFQxwhWaAU",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Extração de Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extração de Dados": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
